@@ -1,0 +1,24 @@
+{
+  "name": "untitled",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start-nx-command-server": "node ./nx_command_server/nx_command_server.js",
+    "start-nx-command-client": "node ./nx_command_server/nx_command_client.js",
+    "start-game-server": "node ./game_server/game_server.js",
+    "start-game-client": "node ./game_server/game_client.js"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.3.6",
+    "@grpc/proto-loader": "^0.6.4",
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "express": "~4.16.1",
+    "grpc": "^1.24.11",
+    "minimist": "^1.2.5",
+    "morgan": "~1.9.1",
+    "protobufjs": "^6.11.2",
+    "node-fetch": "^2.6.1",
+    "query-string": "^7.0.1"
+  }
+}

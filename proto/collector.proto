@@ -1,0 +1,26 @@
+// greeter.proto
+syntax = "proto3";
+package sample;
+
+service Collector {
+  rpc Collect (CollectRequest) returns (CollectReply) {}
+}
+
+message CollectRequest {
+  message Value {
+    int64 numValue = 1;
+  }
+
+  message Items {
+    string id = 1;
+    Value value = 2;
+  }
+
+  string operation = 1;
+  repeated Items items = 2;
+}
+
+message CollectReply {
+  int64 result = 1;
+}
+
