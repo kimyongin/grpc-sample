@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "start-nx-command-server": "node ./nx_command_server/nx_command_server.js",
+    "start-nx-command-server-stream": "node ./nx_command_server/nx_command_server_stream.js",
     "start-nx-command-client": "node ./nx_command_server/nx_command_client.js",
     "start-game-server": "node ./game_server/game_server.js",
     "start-game-client": "node ./game_server/game_client.js"
