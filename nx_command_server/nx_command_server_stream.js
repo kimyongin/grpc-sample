@@ -7,37 +7,35 @@ var grpc = require('@grpc/grpc-js');
 var protoLoader = require('@grpc/proto-loader');
 var debug = require('debug')('untitled:server');
 var http = require('http');
-var Transform = require('stream').Transform;
-
-function loadProto(protoName, packageName, serviceName) {
-    return protoLoader.load(protoName, {
-        keepCase: true,
-        longs: String,
-        enums: String,
-        defaults: true,
-        oneofs: true
-    }).then(packageDefinition => {
-        return grpc.loadPackageDefinition(packageDefinition)[packageName][serviceName];
-    })
-}
+var {Transform, PassThrough} = require('stream');
 
 router.post('/proto', function (req, res, next) {
+
     var protoServiceLoader = new Transform({
         objectMode: true,
         allowHalfOpen: true,
         transform(command, encoding, callback) {
             const {protoName, packageName, serviceName, methodName, message} = command;
-            loadProto("./proto/" + protoName, packageName, serviceName).then(Client => {
+            protoLoader.load("./proto/" + protoName, {
+                keepCase: true,
+                longs: String,
+                enums: String,
+                defaults: true,
+                oneofs: true
+            }).then(packageDefinition => {
+                return grpc.loadPackageDefinition(packageDefinition)[packageName][serviceName];
+            }).then(Client => {
                 const client = new Client('localhost:9000', grpc.credentials.createInsecure());
-                callback(null, {client: client[methodName].bind(client), message})
+                callback(null, {client, methodName, message})
             });
         }
     })
+
     var grpcStream = new Transform({
         objectMode: true,
         allowHalfOpen: true,
-        transform({client, message}, encoding, callback) {
-            client(message, function (err, response) {
+        transform({client, methodName, message}, encoding, callback) {
+            client[methodName](message, function (err, response) {
                 callback(null, JSON.stringify(response));
             });
         }
@@ -50,10 +48,10 @@ router.post('/proto', function (req, res, next) {
         methodName: req.query.method,
         message: req.body
     }
-
-    protoServiceLoader.pipe(grpcStream).pipe(res);
-    protoServiceLoader.write(command)
-    protoServiceLoader.end(() => console.log("end"));
+    let passThrough = new PassThrough({objectMode:true});
+    passThrough.pipe(protoServiceLoader).pipe(grpcStream).pipe(res);
+    passThrough.write(command)
+    passThrough.end(() => console.log("end"));
 });
 
 // `req` is an http.IncomingMessage, which is a readable stream.

@@ -14,7 +14,7 @@ function loadProto(proto, packageName, serviceName) {
     return grpc.loadPackageDefinition(packageDefinition)[packageName][serviceName];
 }
 
-router.post('/', function (req, res, next) {
+router.post('/proto', function (req, res, next) {
     let Service = loadProto("./proto/" + req.query.proto, req.query.package, req.query.service);
     var client = new Service('localhost:9000', grpc.credentials.createInsecure());
     client[req.query.method](req.body, function (err, response) {
